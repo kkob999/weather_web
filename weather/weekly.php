@@ -88,7 +88,20 @@ function linkResource($rel, $href)
                         <script>
                             async function FetchBtn() {
                                 if (document.getElementById("fetchBtn").value == "Submit") {
-                                    document.getElementById("demo").innerHTML = "Submit";
+                                    
+                                    //fetch current
+                                    var current = {
+                                        "url": "http://localhost/weather_web/weather/current",
+                                        "method": "GET",
+                                        "timeout": 0,
+                                    };
+
+                                    $.ajax(current).done(function (response) {
+                                        console.log(response);
+                                    });
+
+                                    console.log('finish current')
+
                                     //fetch week
                                     var week = {
                                         "url": "http://localhost/weather_web/weather/weekly",
@@ -100,6 +113,8 @@ function linkResource($rel, $href)
                                         console.log(response);
                                     });
 
+                                    console.log('finish week')
+
                                     //fetch hourly
                                     var hour = {
                                         "url": "http://localhost/weather_web/weather/hourly",
@@ -110,6 +125,21 @@ function linkResource($rel, $href)
                                     $.ajax(hour).done(function (response) {
                                         console.log(response);
                                     });
+
+                                    console.log('finish hour')
+
+                                    //fetch month
+                                    var month = {
+                                        "url": "http://localhost/weather_web/weather/monthly",
+                                        "method": "GET",
+                                        "timeout": 0,
+                                    };
+
+                                    await $.ajax(month).done(function (response) {
+                                        console.log(response);
+                                    });
+
+                                    console.log('finish month')
 
                                     //database
                                     <?php
@@ -136,6 +166,7 @@ function linkResource($rel, $href)
 
 
                             async function handleClick() {
+                                alert("Fetch Chiang Mai weather")
                                 await FetchBtn()
                                 location.reload()
                             }

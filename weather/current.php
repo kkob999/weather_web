@@ -1,15 +1,12 @@
 <?php
 include 'db.php';
 $conn = OpenCon();
-// echo "Connected Successfully";
 
 $sql = " SELECT * FROM current_weather";
 $sql_hr = "SELECT * FROM hourly_weather where id BETWEEN 
 (SELECT id FROM hourly_weather hr, current_weather cr WHERE hr.time = cr.time) 
 AND (SELECT id FROM hourly_weather hr, current_weather cr WHERE hr.time = cr.time)+4";
-
 $sql_m = "SELECT * FROM weekly_weather WHERE id BETWEEN 0 AND 4";
-
 $sql_day = "SELECT * FROM hourly_weather WHERE id IN (6,12,18,23)";
 
 
@@ -104,7 +101,6 @@ function linkResource($rel, $href)
             <script>
               async function FetchBtn() {
                 if (document.getElementById("fetchBtn").value == "Submit") {
-                  document.getElementById("demo").innerHTML = "Submit";
 
                   //fetch current
                   var current = {
@@ -145,6 +141,19 @@ function linkResource($rel, $href)
 
                   console.log('finish hour')
 
+                  //fetch month
+                  var month = {
+                    "url": "http://localhost/weather_web/weather/monthly",
+                    "method": "GET",
+                    "timeout": 0,
+                  };
+
+                  await $.ajax(month).done(function (response) {
+                    console.log(response);
+                  });
+
+                  console.log('finish month')
+
                   //database
                   <?php
 
@@ -176,11 +185,10 @@ function linkResource($rel, $href)
               }
 
               async function handleClick() {
+                alert("Fetch Chiang Mai weather")
                 await FetchBtn()
                 location.reload()
               }
-
-
             </script>
             <p id="demo"></p>
           </li>
@@ -196,8 +204,7 @@ function linkResource($rel, $href)
       <!-- Search Bar -->
       <div class="search">
         <form id="searchBar">
-          <input id="searchBox" type="text" placeholder="Enter city name" value="" name="sb">
-
+          <input id="searchBox" type="text" placeholder="Enter city name" value="">
           <button id="searchBtn" value="search" onclick="handleSearch()" type="button">
             <img style="width: 30px; height: 30px;" src="./img/search.png">
           </button>
@@ -213,6 +220,7 @@ function linkResource($rel, $href)
               } else {
                 console.log(document.getElementById("searchBox").value)
 
+                //fetch current
                 var current = {
                   "url": "http://localhost/weather_web/weather/current/" + document.getElementById("searchBox").value,
                   "method": "GET",
@@ -225,6 +233,7 @@ function linkResource($rel, $href)
 
                 console.log('finish current')
 
+                //fetch hour
                 var hour = {
                   "url": "http://localhost/weather_web/weather/hourly/" + document.getElementById("searchBox").value,
                   "method": "GET",
@@ -237,10 +246,10 @@ function linkResource($rel, $href)
 
                 console.log('finish hour')
 
-                var week_url = "http://localhost/weather_web/weather/weekly/" + document.getElementById("searchBox").value;
-                // console.log(week_url)
+                //fetch weeek
+
                 var week = {
-                  "url": week_url,
+                  "url": "http://localhost/weather_web/weather/weekly/" + document.getElementById("searchBox").value,
                   "method": "GET",
                   "timeout": 0,
                 };
@@ -250,6 +259,17 @@ function linkResource($rel, $href)
                 });
 
                 console.log('finish week')
+
+                //fetch month
+                var month = {
+                  "url": "http://localhost/weather_web/weather/monthly/" + document.getElementById("searchBox").value,
+                  "method": "GET",
+                  "timeout": 0,
+                };
+
+                await $.ajax(month).done(function (response) {
+                  console.log(response);
+                });
 
                 <?php
 
@@ -304,7 +324,6 @@ function linkResource($rel, $href)
           </div>
 
 
-
           <div class="flex-row" style="margin-left: 40px; justify-content: space-between; margin-right: 200px;">
 
             <div>
@@ -317,6 +336,7 @@ function linkResource($rel, $href)
               $d = "<div style=''>";
               $im = "<img style='height: 120px; width: 120px; margin: auto; display: block;'";
               $im_ovc = "<img style='height: 100px; width: 130px; margin: auto; display: block;'";
+              // image function
               switch ($rows['icon']) {
 
                 case 0:
@@ -440,6 +460,7 @@ function linkResource($rel, $href)
               $d = "<div>";
               $im = "<img style='height: 120px; width: 120px; margin: auto; display: block;'";
               $im_ovc = "<img style='height: 100px; width: 130px; margin: auto; display: block;'";
+              //image function
               switch ($rows['icon']) {
 
                 case 0:

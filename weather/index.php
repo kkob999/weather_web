@@ -48,6 +48,8 @@ $app->get('/current', function (Request $request, Response $response, $args) {
     $data = json_decode($res, true);
     $time_arr = $data['hourly']['time'];
 
+    $gmt_offset = 7;
+
 
     $rows = array(array());
     $att = array(
@@ -94,7 +96,14 @@ $app->get('/current', function (Request $request, Response $response, $args) {
             $rows[$idx][12] = $data['daily']['uv_index_max'][0];
             $rows[$idx][13] = $data['daily']['sunset'][0];
             $rows[$idx][14] = $data['daily']['sunrise'][0];
-            $rows[$idx][15] = $data['hourly']['time'][$i];
+            $local_time = (int)substr($data['hourly']['time'][$i],11,2)+$gmt_offset;
+            if ($local_time==24) {
+                $local_time = "00";
+            }else if ($local_time>24) {
+                $tm = $local_time-24;
+                $local_time = '0'.$tm;
+            }
+            $rows[$idx][15] = substr($data['hourly']['time'][$i],0,11).$local_time.substr($data['hourly']['time'][$i],13,3);
         }
     }
 
@@ -178,11 +187,39 @@ $app->get('/current/{city}', function (Request $request, Response $response, $ar
     $loc = json_decode($res, true);
     $lat = round($loc[0]['lat'], 2);
     $lon = round($loc[0]['lon'], 2);
+    $timezone = $loc[0]['country'];
 
     settype($lat, 'string');
     settype($lon, 'string');
 
-    // echo $lat;
+    //fetch gmt time
+
+    $url_loc = 'https://timezone.abstractapi.com/v1/current_time/?api_key=6877a856b24e4abd8ec1c7fcdef72670&location='.$city.','.$timezone;
+
+    $curl = curl_init();
+
+    curl_setopt_array(
+        $curl,
+        array(
+            CURLOPT_URL => $url_loc,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        )
+    );
+
+    $getgmt = curl_exec($curl);
+
+    curl_close($curl);
+    
+    $gmt = json_decode($getgmt, true);
+
+    $gmt_offset = $gmt['gmt_offset'];
+
 
     //fetch lat lon
 
@@ -257,7 +294,14 @@ $app->get('/current/{city}', function (Request $request, Response $response, $ar
             $rows[$idx][12] = $data['daily']['uv_index_max'][0];
             $rows[$idx][13] = $data['daily']['sunset'][0];
             $rows[$idx][14] = $data['daily']['sunrise'][0];
-            $rows[$idx][15] = $data['hourly']['time'][$i];
+            $local_time = (int)substr($data['hourly']['time'][$i],11,2)+$gmt_offset;
+            if ($local_time==24) {
+                $local_time = "00";
+            }else if ($local_time>24) {
+                $tm = $local_time-24;
+                $local_time = '0'.$tm;
+            }
+            $rows[$idx][15] = substr($data['hourly']['time'][$i],0,11).$local_time.substr($data['hourly']['time'][$i],13,3);
         }
     }
 

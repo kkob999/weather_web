@@ -7,7 +7,7 @@ $sql_curr = " SELECT * FROM hourly_weather WHERE id = (SELECT h.id FROM hourly_w
 $result = $conn->query($sql);
 $result_curr = $conn->query($sql_curr);
 
-$sql_loc = " SELECT * FROM hourly_weather WHERE id = 0";
+$sql_loc = " SELECT city FROM hourly_weather WHERE id = 0";
 $result_loc = $conn->query($sql_loc);
 
 //close connection
@@ -82,13 +82,13 @@ function linkResource($rel, $href)
                     </li>
                     <li>
                         <form type="submit">
-                            <button id="fetchBtn" class="fetch-btn" value="Submit" onclick="FetchBtn()">Fetch
+                            <button id="fetchBtn" class="fetch-btn" value="Submit" onclick="handleClick()">Fetch
                                 API</button>
                         </form>
                         <script>
-                            function FetchBtn() {
+                            async function FetchBtn() {
                                 if (document.getElementById("fetchBtn").value == "Submit") {
-                                    document.getElementById("demo").innerHTML = "Submit";
+
                                     //fetch current
                                     var current = {
                                         "url": "http://localhost/weather_web/weather/current",
@@ -99,6 +99,22 @@ function linkResource($rel, $href)
                                     $.ajax(current).done(function (response) {
                                         console.log(response);
                                     });
+
+                                    console.log('finish current')
+
+                                    //fetch week
+                                    var week = {
+                                        "url": "http://localhost/weather_web/weather/weekly",
+                                        "method": "GET",
+                                        "timeout": 0,
+                                    };
+
+                                    $.ajax(week).done(function (response) {
+                                        console.log(response);
+                                    });
+
+                                    console.log('finish week')
+
                                     //fetch hourly
                                     var hour = {
                                         "url": "http://localhost/weather_web/weather/hourly",
@@ -110,6 +126,21 @@ function linkResource($rel, $href)
                                         console.log(response);
                                     });
 
+                                    console.log('finish hour')
+
+                                    //fetch month
+                                    var month = {
+                                        "url": "http://localhost/weather_web/weather/monthly",
+                                        "method": "GET",
+                                        "timeout": 0,
+                                    };
+
+                                    await $.ajax(month).done(function (response) {
+                                        console.log(response);
+                                    });
+
+                                    console.log('finish month')
+
                                     <?php
 
                                     $conn = OpenCon();
@@ -119,7 +150,7 @@ function linkResource($rel, $href)
                                     $result = $conn->query($sql);
                                     $result_curr = $conn->query($sql_curr);
 
-                                    $sql_loc = " SELECT * FROM weekly_weather WHERE id = 0";
+                                    $sql_loc = " SELECT * FROM hourly_weather WHERE id = 0";
                                     $result_loc = $conn->query($sql_loc);
 
                                     CloseCon($conn);
@@ -129,6 +160,12 @@ function linkResource($rel, $href)
                                 }
                             }
 
+
+                            async function handleClick() {
+                                alert("Fetch Chiang Mai weather")
+                                await FetchBtn()
+                                location.reload()
+                            }
 
                         </script>
                         <p id="demo"></p>
@@ -184,6 +221,17 @@ function linkResource($rel, $href)
 
                                 console.log('finish hour')
 
+                                //fetch week
+                                var week = {
+                                    "url": "http://localhost/weather_web/weather/weekly/" + document.getElementById("searchBox").value,
+                                    "method": "GET",
+                                    "timeout": 0,
+                                };
+
+                                $.ajax(week).done(function (response) {
+                                    console.log(response);
+                                });
+
                                 <?php
 
                                 $conn = OpenCon();
@@ -193,7 +241,7 @@ function linkResource($rel, $href)
                                 $result = $conn->query($sql);
                                 $result_curr = $conn->query($sql_curr);
 
-                                $sql_loc = " SELECT * FROM weekly_weather WHERE id = 0";
+                                $sql_loc = " SELECT * FROM hourly_weather WHERE id = 0";
                                 $result_loc = $conn->query($sql_loc);
 
                                 CloseCon($conn);
@@ -219,13 +267,16 @@ function linkResource($rel, $href)
                         $unixTimestamp = strtotime($date);
                         $dayOfWeek = date("l", $unixTimestamp);
                         ?>
-                        <h2>
-                            <?php
-                            echo $dayOfWeek . ", " . substr($date, 8) . " ";
-                            $datetime = DateTime::createFromFormat('Y-m-d', $date);
-                            echo $datetime->format('F');
-                            ?>
-                        </h2>
+                        <div style="flex-row">
+                            <h2>
+                                <?php
+                                echo $dayOfWeek . ", " . substr($date, 8) . " ";
+                                $datetime = DateTime::createFromFormat('Y-m-d', $date);
+                                echo $datetime->format('F');
+                                ?>
+                            </h2>
+                        </div>
+
                         <div class="flex-row ">
                             <div style="width: 15%; align-self: center;">
                                 <p class="">
@@ -470,7 +521,6 @@ function linkResource($rel, $href)
                                 <?php echo " in " . $rows_loc['city']; ?>
                             </h1>
                         <?php } ?>
-
                     </div>
                     <?php while ($rows = $result->fetch_assoc()) { ?>
                         <div>

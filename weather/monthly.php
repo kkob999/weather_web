@@ -78,16 +78,54 @@ function linkResource($rel, $href)
                     </li>
                     <li>
                         <form type="submit">
-                            <button id="fetchBtn" class="fetch-btn" value="Submit" onclick="FetchBtn()">Fetch
+                            <button id="fetchBtn" class="fetch-btn" value="Submit" onclick="handleClick()">Fetch
                                 API</button>
                         </form>
                         <script>
 
                             async function FetchBtn() {
                                 if (document.getElementById("fetchBtn").value == "Submit") {
-                                    document.getElementById("demo").innerHTML = "Submit";
-                                    console.log("btn working")
+
                                     //fetch current
+                                    var current = {
+                                        "url": "http://localhost/weather_web/weather/current",
+                                        "method": "GET",
+                                        "timeout": 0,
+                                    };
+
+                                    $.ajax(current).done(function (response) {
+                                        console.log(response);
+                                    });
+
+                                    console.log('finish current')
+
+                                    //fetch week
+                                    var week = {
+                                        "url": "http://localhost/weather_web/weather/weekly",
+                                        "method": "GET",
+                                        "timeout": 0,
+                                    };
+
+                                    $.ajax(week).done(function (response) {
+                                        console.log(response);
+                                    });
+
+                                    console.log('finish week')
+
+                                    //fetch hourly
+                                    var hour = {
+                                        "url": "http://localhost/weather_web/weather/hourly",
+                                        "method": "GET",
+                                        "timeout": 0,
+                                    };
+
+                                    $.ajax(hour).done(function (response) {
+                                        console.log(response);
+                                    });
+
+                                    console.log('finish hour')
+
+                                    //fetch month
                                     var month = {
                                         "url": "http://localhost/weather_web/weather/monthly",
                                         "method": "GET",
@@ -95,7 +133,6 @@ function linkResource($rel, $href)
                                     };
 
                                     await $.ajax(month).done(function (response) {
-                                        setTimeout(() => { console.log("finish month"); }, 2000);
                                         console.log(response);
                                     });
 
@@ -121,7 +158,8 @@ function linkResource($rel, $href)
                             }
 
                             async function handleClick() {
-                                await testFetchBtn()
+                                alert("Fetch Chiang Mai weather")
+                                await FetchBtn()
                                 location.reload()
                             }
 
@@ -156,6 +194,9 @@ function linkResource($rel, $href)
                             } else {
                                 console.log(document.getElementById("searchBox").value)
 
+
+
+                                // fetch month
                                 var month = {
                                     "url": "http://localhost/weather_web/weather/monthly/" + document.getElementById("searchBox").value,
                                     "method": "GET",
@@ -198,7 +239,8 @@ function linkResource($rel, $href)
                     <h1 style="margin-right: 10px;">Monthly Weather</h1>
                     <?php while ($rows_loc = $result_loc->fetch_assoc()) {
                         ?>
-                        <h1 id="city" style="font-size: 20px; align-self: end; margin-top: auto; margin-bottom: 2px; color: #0093E9;">
+                        <h1 id="city"
+                            style="font-size: 20px; align-self: end; margin-top: auto; margin-bottom: 2px; color: #0093E9;">
                             <?php echo " in " . $rows_loc['city']; ?>
                         </h1>
                     <?php } ?>
